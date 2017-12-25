@@ -2,7 +2,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 class TTTBot {
-    // Places the best move in the given TTTGame.
+    // Places the best move in the given TTTGame for the current TTTCellValue to move.
     static void makeMove(TTTGame game) {
         BoardPosition bestPosition = getBestPosition(game);
         game.place(bestPosition.row, bestPosition.col);
@@ -16,8 +16,10 @@ class TTTBot {
 
         for (BoardPosition p : possiblePositions) {
             int weight = getWeight(p, game);
-            System.out.println("(" + p.row + ", " + p.col + "): " + weight);
-            if (weight > maxWeight) {
+
+            if (weight == 1) return p; // no need to try other moves if the current one is good
+
+            if (weight > maxWeight) { // otherwise, look for the best alternatives
                 bestPosition = p;
                 maxWeight = weight;
             }
@@ -44,38 +46,17 @@ class TTTBot {
         return possiblePositions;
     }
 
-    // Calculates the weight of a given position where the game and whether the bot is X or O is given.
+    // Calculates the weight of a given position for the current TTTCellValue to move.
+    // Returns -1, 0, or 1. -1 means probably a loss, 0 is probably a tie, 1 is probably a win.
     private static int getWeight(BoardPosition candidatePos, TTTGame game) {
         TTTGame gameWithCandidatePos = new TTTGame(game);
         gameWithCandidatePos.place(candidatePos.row, candidatePos.col);
 
         if (gameWithCandidatePos.isGameOver()) {
-            if (gameWithCandidatePos.getWinner() != null) {
-                return 1; // means that the bot won
-            }
+            return (gameWithCandidatePos.getWinner() != null) ? 1 : 0;
         }
 
-        List<BoardPosition> possibleOpponentPositions = getPossibleMoves(gameWithCandidatePos);
-        int candidateWeight = 0;
-
-        for (BoardPosition possibleOpponentPos : possibleOpponentPositions) {
-            TTTGame gameWithOpponentCandidatePos = new TTTGame(gameWithCandidatePos);
-            gameWithOpponentCandidatePos.place(possibleOpponentPos.row, possibleOpponentPos.col);
-
-            if (gameWithOpponentCandidatePos.isGameOver()) {
-                if (gameWithOpponentCandidatePos.getWinner() != null) { // means that the opponent won
-                    candidateWeight += -1;
-                }
-            } else {
-                List<BoardPosition> remainingPositionsForBot = getPossibleMoves(gameWithOpponentCandidatePos);
-
-                for (BoardPosition remainingPosition : remainingPositionsForBot) {
-                    candidateWeight += getWeight(remainingPosition, gameWithOpponentCandidatePos);
-                }
-            }
-        }
-
-        return candidateWeight;
+        return -1 * getWeight(getBestPosition(new TTTGame(gameWithCandidatePos)), new TTTGame(gameWithCandidatePos));
     }
 
     // Represents a valid position on a TTT board.
