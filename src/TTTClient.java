@@ -7,7 +7,11 @@ public class TTTClient {
         System.out.println("Player assigned to " + playerVal.getRepresentation() + ".");
         TTTGame game = new TTTGame();
         System.out.println(game);
+        TTTGame endGame = runGame(game, playerVal);
+        printEndGameInfo(endGame, playerVal);
+    }
 
+    private static TTTGame runGame(TTTGame game, TTTCellValue playerVal) {
         while (!game.isGameOver()) {
             TTTCellValue nextToMove = game.getNextValueToPlace();
 
@@ -17,7 +21,13 @@ public class TTTClient {
                 int row = Integer.parseInt(scan.next());
                 System.out.print("Column: ");
                 int col = Integer.parseInt(scan.next());
-                game.place(row, col);
+
+                try {
+                    game.place(row, col);
+                } catch (Exception e) {
+                    System.out.println("Problem: " + e.getMessage() + " Please try again.");
+                }
+
                 System.out.println();
             } else {
                 System.out.println("Bot is making move...\n");
@@ -27,7 +37,11 @@ public class TTTClient {
             System.out.println(game);
         }
 
-        TTTCellValue winner = game.getWinner();
+        return game;
+    }
+
+    private static void printEndGameInfo(TTTGame endGame, TTTCellValue playerVal) {
+        TTTCellValue winner = endGame.getWinner();
 
         if (winner == null) {
             System.out.println("Tie.");
