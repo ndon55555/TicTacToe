@@ -35,16 +35,16 @@ class TTTGame {
     // Checks if the given row and col values are within [0, BOARD_SIZE).
     private void checkRowAndCol(int row, int col) throws IllegalArgumentException {
         if (row < 0 || BOARD_SIZE <= row)
-            throw new IllegalArgumentException("row is not between [0, " + BOARD_SIZE + ")");
+            throw new IllegalArgumentException("Row is not between [0, " + BOARD_SIZE + ").");
         if (col < 0 || BOARD_SIZE <= col)
-            throw new IllegalArgumentException("col is not between [0, " + BOARD_SIZE + ")");
+            throw new IllegalArgumentException("Column is not between [0, " + BOARD_SIZE + ").");
     }
 
     // Returns the TTTCellValue found at the given row and col in the board.
     TTTCellValue getTTTCellValue(int row, int col) throws IllegalArgumentException {
         checkRowAndCol(row, col);
 
-        return this.board[row][col];
+        return board[row][col];
     }
 
     // Returns the size of the board.
@@ -53,28 +53,23 @@ class TTTGame {
     }
 
     // Adds the next TTTCellValue to the given row and column values.
-    // Returns true if successfully added, false otherwise.
-    // false means that there was already something placed in the chosen cell.
-    boolean place(int row, int col) throws IllegalArgumentException {
+    void place(int row, int col) throws IllegalArgumentException {
         checkRowAndCol(row, col);
 
-        if (this.board[row][col] == null) {
-            this.board[row][col] = nextValueToPlace;
-            updateNextValueToPlace();
-            calculateWinner();
+        if (board[row][col] != null)
+            throw new IllegalStateException("Chosen spot is occupied.");
 
-            return true;
-        }
-
-        return false;
+        board[row][col] = nextValueToPlace;
+        updateNextValueToPlace();
+        calculateWinner();
     }
 
     // Updates what the next TTTCellValue to place should be.
     private void updateNextValueToPlace() {
-        if (this.nextValueToPlace.equals(TTTCellValue.X)) {
-            this.nextValueToPlace = TTTCellValue.O;
+        if (nextValueToPlace.equals(TTTCellValue.X)) {
+            nextValueToPlace = TTTCellValue.O;
         } else { // this.nextValueToPlace.equals(TTTCellValue.O)
-            this.nextValueToPlace = TTTCellValue.X;
+            nextValueToPlace = TTTCellValue.X;
         }
     }
 
@@ -82,9 +77,9 @@ class TTTGame {
     // winner is unchanged (remains null) if no winner found.
     private void calculateWinner() {
         if (doesXWin()) {
-            this.winner = TTTCellValue.X;
+            winner = TTTCellValue.X;
         } else if (doesOWin()) {
-            this.winner = TTTCellValue.O;
+            winner = TTTCellValue.O;
         }
     }
 
@@ -109,7 +104,7 @@ class TTTGame {
             boolean allSameInRow = true;
 
             for (int c = 0; c < BOARD_SIZE && allSameInRow; c++) {
-                if (!cv.equals(this.board[r][c])) allSameInRow = false;
+                if (!cv.equals(board[r][c])) allSameInRow = false;
             }
 
             if (allSameInRow) return true;
@@ -124,7 +119,7 @@ class TTTGame {
             boolean allSameInCol = true;
 
             for (int r = 0; r < BOARD_SIZE && allSameInCol; r++) {
-                if (!cv.equals(this.board[r][c])) allSameInCol = false;
+                if (!cv.equals(board[r][c])) allSameInCol = false;
             }
 
             if (allSameInCol) return true;
@@ -135,22 +130,22 @@ class TTTGame {
 
     // Determines if the given TTTCellValue shows up in every element of either diagonals.
     private boolean hasEitherDiagonal(TTTCellValue cv) {
-        return hasTopLeftToBottomRightDiagonal(cv) || hasBottomLeftToTopRightDiagonal(cv);
+        return hasTopLeftToBottomRightDiagonal(cv) || hasTopRightToBottomLeftDiagonal(cv);
     }
 
     // Determines if the given TTTCellValue shows up in every element of the diagonal going top left to bottom right.
     private boolean hasTopLeftToBottomRightDiagonal(TTTCellValue cv) {
         for (int i = 0; i < BOARD_SIZE; i++) {
-            if (!cv.equals(this.board[i][i])) return false;
+            if (!cv.equals(board[i][i])) return false;
         }
 
         return true;
     }
 
     // Determines if the Given TTTCellValue shows up in every element of the diagonal going bottom left to top right.
-    private boolean hasBottomLeftToTopRightDiagonal(TTTCellValue cv) {
+    private boolean hasTopRightToBottomLeftDiagonal(TTTCellValue cv) {
         for (int i = 0; i < BOARD_SIZE; i++) {
-            if (!cv.equals(this.board[i][BOARD_SIZE - i - 1])) return false;
+            if (!cv.equals(board[i][BOARD_SIZE - i - 1])) return false;
         }
 
         return true;
@@ -165,7 +160,7 @@ class TTTGame {
     private boolean hasEmpty() {
         for (int r = 0; r < BOARD_SIZE; r++) {
             for (int c = 0; c < BOARD_SIZE; c++) {
-                if (this.board[r][c] == null) return true;
+                if (board[r][c] == null) return true;
             }
         }
 
